@@ -27,3 +27,6 @@ class Point:
         dely = self.y - p2.y
         delz = self.z - p2.z
         return (delx ** 2 + dely ** 2 + delz ** 2)**(1/2)
+
+    def point_return_list(self):
+        return [self.x, self.y, self.z]
