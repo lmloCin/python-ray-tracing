@@ -15,3 +15,11 @@ class Sphere:
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
 
+
+class Plane:
+    def __init__(self, p: Point, nvector, color):
+        self.p = p  # Ponto pertencente ao plano
+        self.nvector = nvector  # vetor normal ao plano
+        self.color = color    # Lista normalizada RGB
+
+
