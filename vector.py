@@ -26,4 +26,9 @@ class Vector:
 
     def vector_dot_product(self, v2):
         return self.x * v2.x + self.y * v2.y + self.z * v2.z
-    # Implemente os métodos de vetores aqui
+
+    def vector_product(self, v2):
+        return Vector((self.y * v2.z) - (self.z * v2.y), (v2.x * self.z) - (self.x * v2.z), (self.x * v2.y) - (self.y * v2.x))
+
+    def vector_return_list(self):
+        return [self.x, self.y, self.z]
