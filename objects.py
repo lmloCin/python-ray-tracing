@@ -22,4 +22,10 @@ class Plane:
         self.nvector = nvector  # vetor normal ao plano
         self.color = color    # Lista normalizada RGB
 
-
+    def inter_plane_line(self, p, vectorD):
+        proj = self.nvector.vector_dot_product(vectorD)
+        if proj == 0:
+            return [False]
+        param = (self.nvector.vector_dot_product(self.p) - self.nvector.vector_dot_product(p)) / proj
+        x, y, z = p[0] + vectorD[0] * param, p[1] + vectorD[1] * param, p[2] + vectorD[2] * param
+        return [True, [x, y, z]]
