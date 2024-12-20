@@ -27,5 +27,5 @@ class Plane:
         if proj == 0:
             return [False]
         param = (self.nvector.vector_dot_product(self.p) - self.nvector.vector_dot_product(p)) / proj
-        x, y, z = p[0] + vectorD[0] * param, p[1] + vectorD[1] * param, p[2] + vectorD[2] * param
+        x, y, z = p.x + vectorD.x * param, p.y + vectorD.y * param, p.z + vectorD.z * param
         return [True, [x, y, z]]

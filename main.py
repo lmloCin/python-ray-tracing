@@ -1,7 +1,7 @@
-import vector
 from obj_reader import ObjReader
 from point import Point
 from vector import Vector
+from objects import Plane
 # Divirtam-se :)
 
 def main():
@@ -12,8 +12,6 @@ def main():
     v1 = Vector(-2, 0, 1)
     v2 = Vector(4, 2, 5)
     print(type(v2))
-    if type(v2) == vector.Vector:
-        print('yes')
     print(v1.vector_sum(v2))
     print(v1.vector_subtraction(v2))
     print(v1.vector_dot_product(v2))
@@ -21,6 +19,8 @@ def main():
     print(v1.vector_product(v2))
     print(h.point_distance(w))
     print(j.__str__())
+    pi = Plane(h, v1, [75, 203, 133])
+    print(pi.inter_plane_line(w, v2))
 
     #obj = ObjReader('inputs/icosahedron.obj')
     #obj.print_faces()
