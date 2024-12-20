@@ -7,7 +7,7 @@ class Vector:
         y (float): Componente do vetor na direção Y.
         z (float): Componente do vetor na direção Z.
     """
-    def __init__(self, x: float, y: float, z:float):
+    def __init__(self, x: float, y: float, z: float):
         self.x = x
         self.y = y
         self.z = z
@@ -32,3 +32,12 @@ class Vector:
 
     def vector_return_list(self):
         return [self.x, self.y, self.z]
+
+    def vector_normalize(self):
+        v = Vector(0, 0, 0)
+        delx = self.x - v.x
+        dely = self.y - v.y
+        delz = self.z - v.z
+        delta = (delx ** 2 + dely ** 2 + delz ** 2)**(1/2)
+        return Vector(self.x/delta, self.y/delta, self.z/delta)
+
