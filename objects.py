@@ -23,9 +23,12 @@ class Plane:
         self.color = color    # Lista normalizada RGB
 
     def inter_plane_line(self, p, vectorD):
+        #projeção do vetor diretor no vetor normal
         proj = self.nvector.vector_dot_product(vectorD)
+        #verifica se o plano e a reta são paralelos 
         if proj == 0:
-            return [False]
+            return [False, [0, 0, 0]]
+        #calcula o ponto de interseção
         param = (self.nvector.vector_dot_product(self.p) - self.nvector.vector_dot_product(p)) / proj
         x, y, z = p.x + vectorD.x * param, p.y + vectorD.y * param, p.z + vectorD.z * param
         return [True, [x, y, z]]
