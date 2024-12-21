@@ -16,15 +16,16 @@ class Sphere:
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
     def inter_sphere_line(self, p: Point, vectorD: Vector):
-        CP = Vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.z)
+        CP = Vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.z) # vetor do ponto inicial da reta até o centro da esfera
 
+        #coeficientes da equação quadrática
         a = vectorD.vector_dot_product(vectorD)
         b = 2 * vectorD.vector_dot_product(CP)
         c = CP.vector_dot_product(CP) - self.radius ** 2
 
         delta = b ** 2 - 4 * a * c
 
-        if delta < 0:
+        if delta < 0: #não existe interseção com a reta
             return [False, [0, 0, 0], float('inf')]
 
         t1 = (-b - sqrt(delta)) / (2 * a)
@@ -32,8 +33,8 @@ class Sphere:
 
         t = min(t1, t2)
         if t < 0:
-            return [False, [0, 0, 0], float('inf')]
-
+            return [False, [0, 0, 0], float('inf')] #ponto de interseção é oposoto ao vetor diretor da reat
+        #calcula o ponto de interseção
         x = p.x + vectorD.x * t
         y = p.y + vectorD.y * t
         z = p.z + vectorD.z * t
