@@ -1,5 +1,6 @@
 from vector import Vector
 from point import Point
+from math import sqrt
 
 
 def normalize_list(list_):  # Pode ser utilizada para normalizar pontos, vetores e listas contendo valores RGB
@@ -14,7 +15,30 @@ class Sphere:
         self.center = center  # Ponto
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
+    def inter_sphere_line(self, p: Point, vectorD: Vector):
+        CP = Vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.z)
 
+        a = vectorD.vector_dot_product(vectorD)
+        b = 2 * vectorD.vector_dot_product(CP)
+        c = CP.vector_dot_product(CP) - self.radius ** 2
+
+        delta = b ** 2 - 4 * a * c
+
+        if delta < 0:
+            return [False, [0, 0, 0], float('inf')]
+
+        t1 = (-b - sqrt(delta)) / (2 * a)
+        t2 = (-b + sqrt(delta)) / (2 * a)
+
+        t = min(t1, t2)
+        if t < 0:
+            return [False, [0, 0, 0], float('inf')]
+
+        x = p.x + vectorD.x * t
+        y = p.y + vectorD.y * t
+        z = p.z + vectorD.z * t
+
+        return [True, [x, y, z], t]
 
 class Plane:
     def __init__(self, p: Point, nvector, color):

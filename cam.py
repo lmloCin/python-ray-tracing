@@ -43,6 +43,11 @@ class Cam:
                     if plane_inter[2] >= 0.1:
                         color = [100, 100, 0]
                         # lower_product = plane_inter[2]
+            elif isinstance(obj, Sphere):
+                sphere_inter = obj.inter_sphere_line(self.local, vetor)
+                if sphere_inter[0]:
+                    if plane_inter[2] >= 0.1:
+                        color = [100, 0, 100]
         return color
 
     def raycasting(self, objects):

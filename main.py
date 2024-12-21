@@ -2,6 +2,7 @@ import point
 from point import Point
 from vector import Vector
 from objects import Plane
+from objects import Sphere
 from cam import Cam
 # Divirtam-se :)
 
@@ -37,9 +38,12 @@ def test():
     up_vector = Vector(0, 1, 0)
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 500, 500)
     plano = Plane(Point(0, 0, 50), Vector(100, 50, 50), [0, 255, 0])
-    obj = [plano]
+    esfera =  Sphere(center=Point(50, 50, 50), radius=30, color=[255, 0, 0])
+    obj = [plano, esfera]
     if isinstance(plano, Plane):
-        print('yes')
+        print('yes, it is a plane')
+    elif isinstance(esfera, Sphere):
+        print('yes, it is a sphere')
     print(type(plano))
     camera.raycasting(obj)
 
