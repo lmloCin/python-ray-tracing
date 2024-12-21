@@ -42,7 +42,7 @@ def test():
     obj = [plano, esfera]
     if isinstance(plano, Plane):
         print('yes, it is a plane')
-    elif isinstance(esfera, Sphere):
+    if isinstance(esfera, Sphere):
         print('yes, it is a sphere')
     print(type(plano))
     camera.raycasting(obj)
