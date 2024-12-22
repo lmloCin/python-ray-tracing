@@ -37,14 +37,15 @@ def test():
     alvo_ponto = Point(0, 0, 0)
     up_vector = Vector(0, 1, 0)
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 500, 500)
-    plano = Plane(Point(0, 0, 50), Vector(100, 50, 50), [0, 255, 0])
-    esfera =  Sphere(center=Point(50, 50, 50), radius=30, color=[255, 0, 0])
+    plano = Plane(Point(0, 0, 0), Vector(0, 0, 1), [0, 255, 0])
+    esfera =  Sphere(center=Point(0, 0, -20), radius=50, color=[255, 0, 0])
     obj = [plano, esfera]
     if isinstance(plano, Plane):
         print('yes, it is a plane')
     if isinstance(esfera, Sphere):
         print('yes, it is a sphere')
     print(type(plano))
+    print(type(esfera))
     camera.raycasting(obj)
 
 

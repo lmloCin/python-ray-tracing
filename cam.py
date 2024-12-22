@@ -33,22 +33,43 @@ class Cam:
         self.vorto3 = self.vorto3.vector_normalize()  # normalizando
         # criado todos os vetores ortonormais
 
+    # def intersection(self, vetor, objects):
+    #     # lower_product = 1000000
+    #     color = [0, 0, 0]
+    #     for obj in objects:
+    #         if isinstance(obj, Plane):
+    #             plane_inter = obj.inter_plane_line(self.local, vetor)
+    #             if plane_inter[0]:
+    #                 if plane_inter[2] >= 0.1:
+    #                     color = [100, 100, 0]
+    #                     # lower_product = plane_inter[2]
+    #         elif isinstance(obj, Sphere):
+    #             sphere_inter = obj.inter_sphere_line(self.local, vetor)
+    #             if sphere_inter[0]:
+    #                 if sphere_inter[2] >= 0.1:
+    #                     color = [100, 0, 100]
+    #     return color
     def intersection(self, vetor, objects):
-        # lower_product = 1000000
-        color = [0, 0, 0]
+        menor_t = float('inf')  # Infinito positivo para garantir que qualquer t encontrado será menor
+        color = [0, 0, 0]  # Cor de fundo padrão (preto)
+
         for obj in objects:
             if isinstance(obj, Plane):
                 plane_inter = obj.inter_plane_line(self.local, vetor)
-                if plane_inter[0]:
-                    if plane_inter[2] >= 0.1:
-                        color = [100, 100, 0]
-                        # lower_product = plane_inter[2]
+                if plane_inter[0] and plane_inter[2] >= 0.1:
+                    if plane_inter[2] < menor_t:
+                        menor_t = plane_inter[2]
+                        color = obj.color  # Use a cor do plano
             elif isinstance(obj, Sphere):
                 sphere_inter = obj.inter_sphere_line(self.local, vetor)
-                if sphere_inter[0]:
-                    if plane_inter[2] >= 0.1:
-                        color = [100, 0, 100]
+                if sphere_inter[0] and sphere_inter[2] >= 0.1:
+                    if sphere_inter[2] < menor_t:
+                        menor_t = sphere_inter[2]
+                        color = obj.color  # Use a cor da esfera
+
         return color
+
+    
 
     def raycasting(self, objects):
 

@@ -31,9 +31,12 @@ class Sphere:
         t1 = (-b - sqrt(delta)) / (2 * a)
         t2 = (-b + sqrt(delta)) / (2 * a)
 
-        t = min(t1, t2)
-        if t < 0:
-            return [False, [0, 0, 0], float('inf')] #ponto de interseção é oposoto ao vetor diretor da reat
+        if t1 > 0:  # Ponto mais próximo
+            t = t1
+        elif t2 > 0:  # Caso o raio saia de dentro da esfera
+            t = t2
+        else:
+            return [False, [0, 0, 0], float('inf')]  # Ambos os pontos estão no lado oposto do raio
         #calcula o ponto de interseção
         x = p.x + vectorD.x * t
         y = p.y + vectorD.y * t
@@ -52,7 +55,7 @@ class Plane:
         proj = self.nvector.vector_dot_product(vectorD)
         # verifica se o plano e a reta são paralelos
         if proj == 0:
-            return [False, [0, 0, 0], 1000000]
+            return [False, [0, 0, 0], float('inf')]
         # calcula o ponto de interseção
         param = (self.nvector.vector_dot_product(self.p) - self.nvector.vector_dot_product(p)) / proj
         x, y, z = p.x + vectorD.x * param, p.y + vectorD.y * param, p.z + vectorD.z * param
