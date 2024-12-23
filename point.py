@@ -26,7 +26,7 @@ class Point:
         delx = self.x - p2.x
         dely = self.y - p2.y
         delz = self.z - p2.z
-        return (delx ** 2 + dely ** 2 + delz ** 2)**(1/2)
+        return (delx ** 2 + dely ** 2 + delz ** 2)**(1/2) #norma de um vetor
 
     def point_return_list(self):
         return [self.x, self.y, self.z]

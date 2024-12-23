@@ -24,11 +24,11 @@ class Vector:
     def vector_x_scalar(self, scalar):
         return Vector(self.x * scalar, self.y * scalar, self.z * scalar)
 
-    def vector_dot_product(self, v2):
-        return self.x * v2.x + self.y * v2.y + self.z * v2.z
+    def vector_dot_product(self, v2): #produto escalar
+        return self.x * v2.x + self.y * v2.y + self.z * v2.z #mede a semelhança de direção entre 2 vetores, se é igual a 0, são ortogonais
 
-    def vector_product(self, v2):
-        return Vector((self.y * v2.z) - (self.z * v2.y), (v2.x * self.z) - (self.x * v2.z), (self.x * v2.y) - (self.y * v2.x))
+    def vector_product(self, v2): #produto vetorial
+        return Vector((self.y * v2.z) - (self.z * v2.y), (v2.x * self.z) - (self.x * v2.z), (self.x * v2.y) - (self.y * v2.x)) #vetor perpendicular aos dois originais
 
     def vector_return_list(self):
         return [self.x, self.y, self.z]

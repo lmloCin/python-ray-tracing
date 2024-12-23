@@ -19,7 +19,7 @@ class Sphere:
         CP = Vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.z) # vetor do ponto inicial da reta até o centro da esfera
 
         #coeficientes da equação quadrática
-        a = vectorD.vector_dot_product(vectorD)
+        a = vectorD.vector_dot_product(vectorD) #produto escalar
         b = 2 * vectorD.vector_dot_product(CP)
         c = CP.vector_dot_product(CP) - self.radius ** 2
 
