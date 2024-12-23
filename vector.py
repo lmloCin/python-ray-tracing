@@ -33,11 +33,9 @@ class Vector:
     def vector_return_list(self):
         return [self.x, self.y, self.z]
 
-    def vector_normalize(self):
-        v = Vector(0, 0, 0)
-        delx = self.x - v.x
-        dely = self.y - v.y
-        delz = self.z - v.z
-        delta = (delx ** 2 + dely ** 2 + delz ** 2)**(1/2)
-        return Vector(self.x/delta, self.y/delta, self.z/delta)
+def vector_normalize(self):
+    delta = (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
+    if delta == 0:
+        raise ValueError("Não é possível normalizar um vetor nulo")
+    return Vector(self.x/delta, self.y/delta, self.z/delta)
 
