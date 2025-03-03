@@ -1,6 +1,6 @@
 from vector import Vector
 from point import Point
-from objects import Plane, Sphere
+from objects import Plane, Sphere, Mesh
 import cv2 as cv
 import numpy as np
 
@@ -50,6 +50,11 @@ class Cam:
                     if sphere_inter[2] < menor_t:
                         menor_t = sphere_inter[2]
                         color = obj.color  # Use a cor da esfera
+            elif isinstance(obj, Mesh):
+                mesh_inter = obj.inter_mesh_line(self.local, vetor)
+                if mesh_inter.t <= menor_t and mesh_inter.t >= 0.01:
+                    color = mesh_inter.cor_normalizada
+                    menor_t = mesh_inter.t
 
         return color
 
