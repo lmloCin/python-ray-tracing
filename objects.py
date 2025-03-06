@@ -66,7 +66,6 @@ class Mesh:
     def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas):
         self.n_triangulos = n_triangulos
         self.n_vertices = n_vertices
-        self.tipo = "Malha"
         self.lista_vertices = lista_vertices
         self.triangulos = triplas # Organizadas por índice
         self.normais_t = lista_normais

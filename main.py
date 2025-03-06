@@ -2,6 +2,7 @@ from point import Point
 from vector import Vector
 from objects import Plane, Sphere, Mesh
 from cam import Cam
+from affine_transformations import translate, rotate_x, rotate_y, rotate_z
 # Divirtam-se :)
 
 
@@ -9,13 +10,20 @@ def main():
     # obj = ObjReader('inputs/icosahedron.obj')
     # obj.print_faces()
     
-    camera_ponto = Point(-100, 200, 500)
+    camera_ponto = Point(100, 200, -100)
     alvo_ponto = Point(0, 0, 0)
     up_vector = Vector(0, 1, 0)
+    u_new = rotate_x([up_vector.x, up_vector.y, up_vector.z ], 180)
+    u_new = Vector(u_new[0], u_new[1], u_new[2])
     
+    center = Point(50, 0, 50)
+    n_center = translate([center.x, center.y, center.z], 50, 40, 0)
+    n_center = Point(n_center[0], n_center[1], n_center[2])
+
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 500, 500)
-    # plano = Plane(Point(0, 0, 0), Vector(0, 1, 0), [100, 55, 0])
-    # esfera =  Sphere(center=Point(0, 0, -45), radius=50, color=[255, 0, 0])
+    new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
+    plano = Plane(Point(-200, 0, 0), Vector(1, 0, 1), [100, 55, 0])
+    esfera =  Sphere(center, radius=50, color=[255, 0, 0])
     # obj = [plano, esfera]
     # camera.raycasting(obj)
     
@@ -40,11 +48,12 @@ def main():
         [(0,1,4), (1,2,4), (2,3,4), (0,3,4)],
         [n1, n2, n3, n4],
         [],
-        [[255, 255, 255], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
+        [[100, 0, 100], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
     )
 
-    objects = [malha]
+    objects = [malha, esfera]
     camera.raycasting(objects)
+    #new_camera.raycasting(objects)
 
 if __name__ == "__main__":
     main()

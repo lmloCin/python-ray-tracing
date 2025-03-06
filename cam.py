@@ -52,7 +52,7 @@ class Cam:
                         color = obj.color  # Use a cor da esfera
             elif isinstance(obj, Mesh):
                 mesh_inter = obj.inter_mesh_line(self.local, vetor)
-                if mesh_inter.t <= menor_t and mesh_inter.t >= 0.01:
+                if mesh_inter.intersecao and mesh_inter.t >= 0.01:
                     color = mesh_inter.cor_normalizada
                     menor_t = mesh_inter.t
 
