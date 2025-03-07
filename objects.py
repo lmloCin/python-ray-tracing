@@ -12,10 +12,15 @@ def normalize_list(list_):  # Pode ser utilizada para normalizar pontos, vetores
 
 
 class Sphere:
-    def __init__(self, center: Point, radius, color):
+    def __init__(self, center: Point, radius, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
         self.center = center  # Ponto
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
+        self.kdCoefficient = kdCoefficient # Coeficient difuso
+        self.ksCoefficient = ksCoefficient # Coeficiente especular
+        self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
+        
     def inter_sphere_line(self, p: Point, vectorD: Vector):
         CP = Vector(p.x - self.center.x, p.y - self.center.y, p.z - self.center.z) # vetor do ponto inicial da reta até o centro da esfera
 
@@ -46,10 +51,14 @@ class Sphere:
         return [True, [x, y, z], t]
 
 class Plane:
-    def __init__(self, p: Point, nvector, color):
+    def __init__(self, p: Point, nvector, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
         self.p = p  # Ponto pertencente ao plano
         self.nvector = nvector  # vetor normal ao plano
         self.color = color    # Lista normalizada RGB
+        self.kdCoefficient = kdCoefficient # Coeficient difuso
+        self.ksCoefficient = ksCoefficient # Coeficiente especular
+        self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
 
     def inter_plane_line(self, p, vectorD):
         # projeção do vetor diretor no vetor normal
@@ -63,7 +72,7 @@ class Plane:
         return [True, [x, y, z], param]
 
 class Mesh:
-    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas):
+    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
         self.n_triangulos = n_triangulos
         self.n_vertices = n_vertices
         self.lista_vertices = lista_vertices
@@ -71,6 +80,10 @@ class Mesh:
         self.normais_t = lista_normais
         self.normais_v = lista_normais_vertices
         self.lista_cores_normalizadas = lista_cores_normalizadas
+        self.kdCoefficient = kdCoefficient # Coeficient difuso
+        self.ksCoefficient = ksCoefficient # Coeficiente especular
+        self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
 
     def inter_mesh_line(self, P, vdiretor):
         menor_t = self.Intersecao_Return(False, 1000000, np.array([0, 0, 0]), self.lista_cores_normalizadas[0])

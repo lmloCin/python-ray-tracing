@@ -3,6 +3,7 @@ from vector import Vector
 from objects import Plane, Sphere, Mesh
 from cam import Cam
 from affine_transformations import translate, rotate_x, rotate_y, rotate_z
+from lightSource import Luz
 # Divirtam-se :)
 
 
@@ -19,6 +20,10 @@ def main():
     center = Point(50, 0, 50)
     n_center = translate([center.x, center.y, center.z], 50, 40, 0)
     n_center = Point(n_center[0], n_center[1], n_center[2])
+    
+    luz_posicao = Point(100, 300, -50)  # Posição da luz acima da câmera
+    Intensidade_luz = (255, 255, 255) # Cor que indica a intensidade da luz
+    luz = Luz(luz_posicao, Intensidade_luz)  # Luz branca
 
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 500, 500)
     new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
@@ -51,7 +56,7 @@ def main():
         [[100, 0, 100], [255, 0, 0], [0, 255, 0], [0, 0, 255]]
     )
 
-    objects = [malha, esfera]
+    objects = [malha, esfera, plano]
     camera.raycasting(objects)
     #new_camera.raycasting(objects)
 
