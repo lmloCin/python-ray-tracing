@@ -86,7 +86,7 @@ class Mesh:
         self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
 
     def inter_mesh_line(self, P, vdiretor):
-        menor_t = self.Intersecao_Return(False, 1000000, np.array([0, 0, 0]), self.lista_cores_normalizadas[0])
+        menor_t = self.Intersecao_Return(False, 1000000, np.array([0, 0, 0]), self.lista_cores_normalizadas[0], idx_triangulo = 0)
         for idx_triangulo in range(self.n_triangulos):
             intersecao = self.intersecao_triangulo_reta(vdiretor, P, idx_triangulo)
             if intersecao.intersecao and intersecao.t <= menor_t.t:
@@ -94,37 +94,39 @@ class Mesh:
         return menor_t
 
     class Intersecao_Return:
-        def __init__(self, intersecao, t, ponto_intersecao, cor_normalizada):
+        def __init__(self, intersecao, t, ponto_intersecao, cor_normalizada, idx_triangulo):
             self.intersecao = intersecao
             self.t = t
             self.ponto_intersecao = ponto_intersecao
             self.cor_normalizada = cor_normalizada
-    def calculo_ponto_intersecao(self, vdiretor: Vector, P: Vector, vetor_normal: Vector, ponto_plano: Vector):
+            self.idx_triangulo = idx_triangulo
+    def calculo_ponto_intersecao(self, vdiretor: Vector, P: Vector, vetor_normal: Vector, ponto_plano: Vector, idx_triangulo):
         temp = vetor_normal.vector_dot_product(vdiretor)
         if temp == 0:
-            return Mesh.Intersecao_Return(False, 1000000, np.array([0, 0, 0]), self.lista_cores_normalizadas[0])
+            return Mesh.Intersecao_Return(False, 1000000, np.array([0, 0, 0]), self.lista_cores_normalizadas[0], idx_triangulo = 0 )
         
         t = (vetor_normal.vector_dot_product(ponto_plano) - vetor_normal.vector_dot_product(P)) / temp
         x = P.x + vdiretor.x * t
         y = P.y + vdiretor.y * t
         z = P.z + vdiretor.z * t
         
-        return Mesh.Intersecao_Return(True, t, Vector(x, y, z), self.lista_cores_normalizadas[0])
+        return Mesh.Intersecao_Return(True, t, Vector(x, y, z), self.lista_cores_normalizadas[0], idx_triangulo)
 
     def intersecao_triangulo_reta(self, vdiretor: Vector, P: Vector, idx_triangulo):
         tripla_triangulo = self.triangulos[idx_triangulo]
         normal_triangulo = self.normais_t[idx_triangulo]
         cor_normalizada = self.lista_cores_normalizadas[idx_triangulo]
+        idx_triangulo = idx_triangulo
 
         temp = normal_triangulo.vector_dot_product(vdiretor)
         if temp == 0:
-            return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada)
+            return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada, idx_triangulo = 0)
 
         p1 = self.lista_vertices[tripla_triangulo[0]]
         p2 = self.lista_vertices[tripla_triangulo[1]]
         p3 = self.lista_vertices[tripla_triangulo[2]]
 
-        intersecao_plano = self.calculo_ponto_intersecao(vdiretor, P, normal_triangulo, p1)
+        intersecao_plano = self.calculo_ponto_intersecao(vdiretor, P, normal_triangulo, p1, idx_triangulo)
 
         if intersecao_plano.intersecao:
             ponto_intersecao = intersecao_plano.ponto_intersecao
@@ -145,6 +147,6 @@ class Mesh:
             u = 1.0 - v - w
 
             if v >= 0 and w >= 0 and u >= 0:
-                return Mesh.Intersecao_Return(True, intersecao_plano.t, ponto_intersecao, cor_normalizada)
+                return Mesh.Intersecao_Return(True, intersecao_plano.t, ponto_intersecao, cor_normalizada, idx_triangulo)
 
-        return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada)
+        return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada, idx_triangulo = 0)
