@@ -52,9 +52,9 @@ class Cam:
 
                         # Calcula a componente ambiente da iluminação
                         ambiente = [
-                            (light.intensity_a * obj.kaCoefficient * obj.color[0]),  # Canal R
-                            (light.intensity_a * obj.kaCoefficient * obj.color[1]),  # Canal G
-                            (light.intensity_a * obj.kaCoefficient * obj.color[2])   # Canal B
+                            (light.intensity_a[0] * obj.kaCoefficient * obj.color[0]),  # Canal R
+                            (light.intensity_a[1] * obj.kaCoefficient * obj.color[1]),  # Canal G
+                            (light.intensity_a[2] * obj.kaCoefficient * obj.color[2])   # Canal B
                         ]
 
                         # Calcula o vetor da luz (L) em relação ao ponto de interseção
@@ -70,9 +70,9 @@ class Cam:
 
                         # Calcula a componente difusa da iluminação
                         difusa = [
-                            (light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[0]),  # Canal R
-                            (light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[1]),  # Canal G
-                            (light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[2])   # Canal B
+                            (light.intensity_d[0] * obj.kdCoefficient * n_x_l * obj.color[0]),  # Canal R
+                            (light.intensity_d[1] * obj.kdCoefficient * n_x_l * obj.color[1]),  # Canal G
+                            (light.intensity_d[2] * obj.kdCoefficient * n_x_l * obj.color[2])   # Canal B
                         ]
 
                         # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
@@ -89,9 +89,9 @@ class Cam:
 
                         # Calcula a componente especular da iluminação
                         especular = [
-                            (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[0]),  # Canal R
-                            (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[1]),  # Canal G
-                            (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[2])   # Canal B
+                            (light.intensity_s[0] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[0]),  # Canal R
+                            (light.intensity_s[1] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[1]),  # Canal G
+                            (light.intensity_s[2] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[2])   # Canal B
                         ]
 
                         # Combina as componentes de iluminação (ambiente, difusa e especular) para obter a cor final
@@ -109,7 +109,7 @@ class Cam:
                         # Calcula o ponto de interseção na superfície da esfera
                         intersect_point = self.local.point_sum(Point(vetor.x * sphere_inter[2], vetor.y* sphere_inter[2], vetor.z* sphere_inter[2]))
                         # Calcula a componente ambiente da iluminação
-                        ambiente = [(light.intensity_a * obj.kaCoefficient * obj.color[0]), (light.intensity_a * obj.kaCoefficient * obj.color[1]), (light.intensity_a * obj.kaCoefficient * obj.color[2])]
+                        ambiente = [(light.intensity_a[0] * obj.kaCoefficient * obj.color[0]), (light.intensity_a[1] * obj.kaCoefficient * obj.color[1]), (light.intensity_a[2] * obj.kaCoefficient * obj.color[2])]
                         # Calcula o vetor da luz (L) em relação ao ponto de interseção
                         l = light.position.point_subtraction(intersect_point)
                         l = Vector(l.x, l.y, l.z).vector_normalize()
@@ -119,7 +119,7 @@ class Cam:
                         # Produto vetorial de n e l
                         n_x_l = l.vector_dot_product(n)
                         # Calcula a componente difusa da iluminação
-                        difusa = [(light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[0]),(light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[1]), (light.intensity_d * obj.kdCoefficient * n_x_l * obj.color[2]) ]
+                        difusa = [(light.intensity_d[0] * obj.kdCoefficient * n_x_l * obj.color[0]),(light.intensity_d[1] * obj.kdCoefficient * n_x_l * obj.color[1]), (light.intensity_d[2] * obj.kdCoefficient * n_x_l * obj.color[2]) ]
                         # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
                         r = n.vector_x_scalar(2 * n_x_l)
                         r = r.vector_subtraction(l)
@@ -130,7 +130,7 @@ class Cam:
                         # Produto vetorial de r e v
                         r_x_v = r.vector_dot_product(v)
                         # Calcula a componente especular da iluminação
-                        especular = [(light.intensity_s * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[0]), (light.intensity_s * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[1]), (light.intensity_s * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[2])]
+                        especular = [(light.intensity_s[0] * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[0]), (light.intensity_s[1] * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[1]), (light.intensity_s[2] * obj.ksCoefficient * ((r_x_v)**obj.nCoefficient) *obj.color[2])]
                         # Combina as componentes de iluminação (ambiente, difusa e especular) para obter a cor final
                         color = [(ambiente[0] + difusa[0] + especular[0]), (ambiente[1] + difusa[1] + especular[1]), (ambiente[2] + difusa[2] + especular[2])]                  
 
@@ -146,9 +146,9 @@ class Cam:
 
                     # Calcula a componente ambiente da iluminação
                     ambiente = [
-                        (light.intensity_a * obj.kaCoefficient * mesh_inter.cor_normalizada[0]),  # Canal R
-                        (light.intensity_a * obj.kaCoefficient * mesh_inter.cor_normalizada[1]),  # Canal G
-                        (light.intensity_a * obj.kaCoefficient * mesh_inter.cor_normalizada[2])   # Canal B
+                        (light.intensity_a[0] * obj.kaCoefficient * mesh_inter.cor_normalizada[0]),  # Canal R
+                        (light.intensity_a[1] * obj.kaCoefficient * mesh_inter.cor_normalizada[1]),  # Canal G
+                        (light.intensity_a[2] * obj.kaCoefficient * mesh_inter.cor_normalizada[2])   # Canal B
                     ]
 
                     # Calcula o vetor da luz (L) em relação ao ponto de interseção
@@ -164,9 +164,9 @@ class Cam:
 
                     # Calcula a componente difusa da iluminação
                     difusa = [
-                        (light.intensity_d * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[0]),  # Canal R
-                        (light.intensity_d * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[1]),  # Canal G
-                        (light.intensity_d * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[2])   # Canal B
+                        (light.intensity_d[0] * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[0]),  # Canal R
+                        (light.intensity_d[1] * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[1]),  # Canal G
+                        (light.intensity_d[2] * obj.kdCoefficient * n_x_l * mesh_inter.cor_normalizada[2])   # Canal B
                     ]
 
                     # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
@@ -183,9 +183,9 @@ class Cam:
 
                     # Calcula a componente especular da iluminação
                     especular = [
-                        (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[0]),  # Canal R
-                        (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[1]),  # Canal G
-                        (light.intensity_s * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[2])   # Canal B
+                        (light.intensity_s[0] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[0]),  # Canal R
+                        (light.intensity_s[1] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[1]),  # Canal G
+                        (light.intensity_s[2] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * mesh_inter.cor_normalizada[2])   # Canal B
                     ]
 
                     # Combina as componentes de iluminação (ambiente, difusa e especular) para obter a cor final

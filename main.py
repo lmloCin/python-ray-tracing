@@ -25,7 +25,8 @@ def main():
     n_center2 = Point(n_center2[0], n_center2[1], n_center2[2])
     
     luz_posicao = Point(100, 300, 200)  # Posição da luz acima da câmera
-    luz = Light(luz_posicao, 0.8, 0.3, 0.6)  # Luz branca
+    #luz = Light(luz_posicao, [0.8, 0.8, 0.8], [0.3,0.3,0.3,], [0.6, 0.6, 0.6])  # Luz branca
+    luz = Light(luz_posicao, [0,0.0,0.8], [0,0.0,0.3], [0,0.0,0.6])  # Luz vermelha
 
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 700, 700)
     new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
