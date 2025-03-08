@@ -12,7 +12,7 @@ def normalize_list(list_):  # Pode ser utilizada para normalizar pontos, vetores
 
 
 class Sphere:
-    def __init__(self, center: Point, radius, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, center: Point, radius, color, kdCoefficient = None, ksCoefficient = None, kaCoefficient = None, nCoefficient = None):
         self.center = center  # Ponto
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
@@ -51,7 +51,7 @@ class Sphere:
         return [True, [x, y, z], t]
 
 class Plane:
-    def __init__(self, p: Point, nvector, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, p: Point, nvector, color, kdCoefficient = None, ksCoefficient = None, kaCoefficient = None, nCoefficient = None):
         self.p = p  # Ponto pertencente ao plano
         self.nvector = nvector  # vetor normal ao plano
         self.color = color    # Lista normalizada RGB
@@ -72,7 +72,7 @@ class Plane:
         return [True, [x, y, z], param]
 
 class Mesh:
-    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas, kdCoefficient = None, ksCoefficient = None, kaCoefficient = None, nCoefficient = None):
         self.n_triangulos = n_triangulos
         self.n_vertices = n_vertices
         self.lista_vertices = lista_vertices
