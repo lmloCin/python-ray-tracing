@@ -4,6 +4,7 @@ from objects import Plane, Sphere, Mesh
 import cv2 as cv
 import numpy as np
 from lightSource import Light
+import math
 
 
 
@@ -35,7 +36,86 @@ class Cam:
         self.vorto3 = self.vorto3.vector_normalize()  # normalizando
         # criado todos os vetores ortonormais
 
-    def intersection(self, vetor: Vector, objects, light:Light):
+    def phong(self, kaCoefficient, luzAmbiente: Light, Il:Light, obj, intersect_point, n, v, krCoefficient, objects, ktCoefficient, ior,  recursionCounter = 0, reflection = True, refraction = True):
+        
+        Ia = luzAmbiente.intensity_a
+        # componente ambiente da fórmula da iluminação
+        aComp = kaCoefficient * Ia
+        
+        # componente difusa da iluminação
+        dComp = [0,0,0]
+        
+        # componente especular da iluminação
+        sComp = [0, 0, 0]
+        
+        # Componente Recursiva
+        reflectionComp = [0, 0, 0] # componente reflexiva da recursão
+        refractionComp = [0, 0, 0] # componente de refração da recursão
+        
+        for i in range(len(Il)):
+            
+            # Calcula o vetor da luz (Il) em relação ao ponto de interseção
+            l = Il[i].position.point_subtraction(intersect_point)
+            l = Vector(l.x, l.y, l.z).vector_normalize()  # Normaliza o vetor da luz
+            
+            # Calcula o produto escalar entre o vetor da luz (L) e o vetor normal (N)
+            n_x_l = l.vector_dot_product(n)
+
+            # Componente difusa
+            dComp += Il[i].intensity_a * obj.color * obj.kdCoefficient * n_x_l
+            
+            # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
+            r = n.vector_x_scalar(2 * n_x_l)
+            r = r.vector_subtraction(l)
+            r = r.vector_normalize()  # Normaliza o vetor de reflexão
+
+            # Calcula o produto escalar entre o vetor de reflexão (R) e o vetor da câmera (V)
+            r_x_v = r.vector_dot_product(v)
+            
+            # Componente Especular
+            sComp += Il[i].intensity_a * obj.ksCoefficient * (r_x_v ** obj.nCoefficient)
+            
+        # Componente Recursiva 
+        if recursionCounter <= 3:
+            
+            if  reflection and krCoefficient > 0:
+                
+                reflection_vector = r * -1
+                recursionCounter = recursionCounter + 1
+                reflectedColor_IR = self.intersection(reflection_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = True, refraction = False)
+                
+                # Componente de reflexão
+                reflectionComp = krCoefficient * reflectedColor_IR
+        
+            if refraction and ktCoefficient > 0:
+                
+                # calcula o produto escalar entre o vetor da camera e o vetor normal do objeto
+                n_x_v = n.vector_dot_product(v)
+                if n_x_v < 0:
+                    normal = n * -1
+                    ior = 1/ior
+                    n_x_v = n_x_v * -1
+                    
+                delta = 1 - (1 - n_x_v * n_x_v) / (ior * ior)
+                if delta >= 0:
+                    
+                    recursionCounter = recursionCounter + 1
+                    refracted_vector =  v / (-ior) - normal * (math.sqrt(delta) - n_x_v/ior)
+                    
+                    refractedColor_IT = self.intersection(refracted_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = False, refraction = True)
+                    
+                    # Componente de refração
+                    refractionComp = ktCoefficient * reflectedColor_IR
+        
+        color = aComp + dComp + sComp + reflectionComp + refractionComp
+        finalColor = np.clip(color, 0, 255)
+        return finalColor 
+                    
+                    
+            
+
+    def intersection(self, vetor: Vector, objects, luzAmbiente:Light, fontesDeLuz:Light, intersect_point = None, recursionCounter = 0, reflection = True, refraction = True):
+        
         menor_t = float('inf')  # Infinito positivo para garantir que qualquer t encontrado será menor
         color = [0, 0, 0]  # Cor de fundo padrão (preto)
 
@@ -45,61 +125,49 @@ class Cam:
                 if plane_inter[0] and plane_inter[2] >= 0.1:
                     if plane_inter[2] < menor_t:
                         menor_t = plane_inter[2]
+                        
                         # Calcula o ponto de interseção na superfície do plano
                         intersect_point = self.local.point_sum(
                             Point(vetor.x * plane_inter[2], vetor.y * plane_inter[2], vetor.z * plane_inter[2])
                         )
-
-                        # Calcula a componente ambiente da iluminação
-                        ambiente = [
-                            (light.intensity_a[0] * obj.kaCoefficient * obj.color[0]),  # Canal R
-                            (light.intensity_a[1] * obj.kaCoefficient * obj.color[1]),  # Canal G
-                            (light.intensity_a[2] * obj.kaCoefficient * obj.color[2])   # Canal B
-                        ]
-
-                        # Calcula o vetor da luz (L) em relação ao ponto de interseção
-                        l = light.position.point_subtraction(intersect_point)
-                        l = Vector(l.x, l.y, l.z).vector_normalize()  # Normaliza o vetor da luz
-
-                        # O vetor normal (N) do plano é constante e já está definido no objeto
+                        
+                         # # O vetor normal (N) do plano é constante e já está definido no objeto
                         n = obj.nvector  # Vetor normal do plano
                         n = n.vector_normalize()  # Garante que o vetor normal está normalizado
-
-                        # Calcula o produto escalar entre o vetor da luz (L) e o vetor normal (N)
-                        n_x_l = l.vector_dot_product(n)
-
-                        # Calcula a componente difusa da iluminação
-                        difusa = [
-                            (light.intensity_d[0] * obj.kdCoefficient * n_x_l * obj.color[0]),  # Canal R
-                            (light.intensity_d[1] * obj.kdCoefficient * n_x_l * obj.color[1]),  # Canal G
-                            (light.intensity_d[2] * obj.kdCoefficient * n_x_l * obj.color[2])   # Canal B
-                        ]
-
-                        # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
-                        r = n.vector_x_scalar(2 * n_x_l)
-                        r = r.vector_subtraction(l)
-                        r = r.vector_normalize()  # Normaliza o vetor de reflexão
-
+                        
                         # Calcula o vetor da câmera (V) em relação ao ponto de interseção
                         v = self.local.point_subtraction(intersect_point)
                         v = Vector(v.x, v.y, v.z).vector_normalize()  # Normaliza o vetor da câmera
+                        
+                        color = self.phong(obj.kaCoefficient, luzAmbiente, fontesDeLuz, obj, intersect_point, n, v, obj.krCoefficient, objects, obj.ktCoefficient, obj.IOR, recursionCounter, reflection = reflection, refraction = refraction)
+                        
+                        # # Calcula a componente ambiente da iluminação
+                        # ambiente = [
+                        #     (light.intensity_a[0] * obj.kaCoefficient * obj.color[0]),  # Canal R
+                        #     (light.intensity_a[1] * obj.kaCoefficient * obj.color[1]),  # Canal G
+                        #     (light.intensity_a[2] * obj.kaCoefficient * obj.color[2])   # Canal B
+                        # ]
 
-                        # Calcula o produto escalar entre o vetor de reflexão (R) e o vetor da câmera (V)
-                        r_x_v = r.vector_dot_product(v)
+                        # # Calcula a componente difusa da iluminação
+                        # difusa = [
+                        #     (light.intensity_d[0] * obj.kdCoefficient * n_x_l * obj.color[0]),  # Canal R
+                        #     (light.intensity_d[1] * obj.kdCoefficient * n_x_l * obj.color[1]),  # Canal G
+                        #     (light.intensity_d[2] * obj.kdCoefficient * n_x_l * obj.color[2])   # Canal B
+                        # ]
 
-                        # Calcula a componente especular da iluminação
-                        especular = [
-                            (light.intensity_s[0] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[0]),  # Canal R
-                            (light.intensity_s[1] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[1]),  # Canal G
-                            (light.intensity_s[2] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[2])   # Canal B
-                        ]
+                        # # Calcula a componente especular da iluminação
+                        # especular = [
+                        #     (light.intensity_s[0] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[0]),  # Canal R
+                        #     (light.intensity_s[1] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[1]),  # Canal G
+                        #     (light.intensity_s[2] * obj.ksCoefficient * ((r_x_v) ** obj.nCoefficient) * obj.color[2])   # Canal B
+                        # ]
 
-                        # Combina as componentes de iluminação (ambiente, difusa e especular) para obter a cor final
-                        color = [
-                            (ambiente[0] + difusa[0] + especular[0]),  # Canal R
-                            (ambiente[1] + difusa[1] + especular[1]),  # Canal G
-                            (ambiente[2] + difusa[2] + especular[2])   # Canal B
-                        ]
+                        # # Combina as componentes de iluminação (ambiente, difusa e especular) para obter a cor final
+                        # color = [
+                        #     (ambiente[0] + difusa[0] + especular[0]),  # Canal R
+                        #     (ambiente[1] + difusa[1] + especular[1]),  # Canal G
+                        #     (ambiente[2] + difusa[2] + especular[2])   # Canal B
+                        # ]
 
             elif isinstance(obj, Sphere):
                 sphere_inter = obj.inter_sphere_line(self.local, vetor)
@@ -197,9 +265,7 @@ class Cam:
 
         return color
 
-    
-
-    def raycasting(self, objects, light):
+    def raycasting(self, objects, luzAmbiente: Light, fontesDeLuz: Light):
 
             self.vorto1 = np.array([self.vorto1.x, self.vorto1.y, self.vorto1.z])
             self.vorto2 = np.array([self.vorto2.x, self.vorto2.y, self.vorto2.z])
@@ -212,7 +278,7 @@ class Cam:
             for i in range(self.width):
                 for j in range(self.high):
                     vetor_atual = pixel_0_0 + deltay*i + deltax*j
-                    image[j, i] = self.intersection(Vector(vetor_atual[0], vetor_atual[1], vetor_atual[2]), objects, light)
+                    image[j, i] = self.intersection(Vector(vetor_atual[0], vetor_atual[1], vetor_atual[2]), objects, luzAmbiente, fontesDeLuz)
             cv.imshow("Raycasting", image)
             cv.waitKey(0)
             cv.destroyAllWindows('i')

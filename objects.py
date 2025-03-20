@@ -12,13 +12,16 @@ def normalize_list(list_):  # Pode ser utilizada para normalizar pontos, vetores
 
 
 class Sphere:
-    def __init__(self, center: Point, radius, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, center: Point, radius, color, kdCoefficient, ksCoefficient, kaCoefficient, krCoefficient, ktCoefficient, irCoefficient, nCoefficient):
         self.center = center  # Ponto
         self.radius = radius  # Número real
         self.color = color    # Lista normalizada RGB
         self.kdCoefficient = kdCoefficient # Coeficient difuso
         self.ksCoefficient = ksCoefficient # Coeficiente especular
         self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.krCoefficient = krCoefficient # Coeficiente de reflexão
+        self.ktCoefficient = ktCoefficient # Coeficiente de refração
+        self.IOR = irCoefficient # Indíce de refração
         self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
         
     def inter_sphere_line(self, p: Point, vectorD: Vector):
@@ -51,13 +54,16 @@ class Sphere:
         return [True, [x, y, z], t]
 
 class Plane:
-    def __init__(self, p: Point, nvector, color, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, p: Point, nvector, color, kdCoefficient, ksCoefficient, kaCoefficient, krCoefficient, ktCoefficient, irCoefficient, nCoefficient):
         self.p = p  # Ponto pertencente ao plano
         self.nvector = nvector  # vetor normal ao plano
         self.color = color    # Lista normalizada RGB
         self.kdCoefficient = kdCoefficient # Coeficient difuso
         self.ksCoefficient = ksCoefficient # Coeficiente especular
         self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.krCoefficient = krCoefficient # Coeficiente de reflexão
+        self.ktCoefficient = ktCoefficient # Coeficiente de refração
+        self.IOR = irCoefficient # Indíce de refração
         self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
 
     def inter_plane_line(self, p, vectorD):
@@ -72,7 +78,7 @@ class Plane:
         return [True, [x, y, z], param]
 
 class Mesh:
-    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas, kdCoefficient, ksCoefficient, kaCoefficient, nCoefficient):
+    def __init__(self, n_triangulos, n_vertices, lista_vertices, triplas, lista_normais, lista_normais_vertices, lista_cores_normalizadas, kdCoefficient, ksCoefficient, kaCoefficient, krCoefficient, ktCoefficient, irCoefficient, nCoefficient):
         self.n_triangulos = n_triangulos
         self.n_vertices = n_vertices
         self.lista_vertices = lista_vertices
@@ -83,6 +89,9 @@ class Mesh:
         self.kdCoefficient = kdCoefficient # Coeficient difuso
         self.ksCoefficient = ksCoefficient # Coeficiente especular
         self.kaCoefficient = kaCoefficient # Coeficiente Ambiental
+        self.krCoefficient = krCoefficient # Coeficiente de reflexão
+        self.ktCoefficient = ktCoefficient # Coeficiente de refração
+        self.IOR = irCoefficient # Indíce de refração
         self.nCoefficient = nCoefficient # Coeficiente de Rugosidade
 
     def inter_mesh_line(self, P, vdiretor):
@@ -116,20 +125,23 @@ class Mesh:
         tripla_triangulo = self.triangulos[idx_triangulo]
         normal_triangulo = self.normais_t[idx_triangulo]
         cor_normalizada = self.lista_cores_normalizadas[idx_triangulo]
-        idx_triangulo = idx_triangulo
 
-        temp = normal_triangulo.vector_dot_product(vdiretor)
-        if temp == 0:
+        #Chechando interseção com o plano em que o triangulo está
+        temp = normal_triangulo.vector_dot_product(vdiretor) #produto vetorial entre normal do triangulo e vdiretor
+        if temp == 0: #são paralelos?
             return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada, idx_triangulo = 0)
 
+        #vértices do triangulo
         p1 = self.lista_vertices[tripla_triangulo[0]]
         p2 = self.lista_vertices[tripla_triangulo[1]]
         p3 = self.lista_vertices[tripla_triangulo[2]]
 
+        #Identificando interseção c o triangulo
         intersecao_plano = self.calculo_ponto_intersecao(vdiretor, P, normal_triangulo, p1, idx_triangulo)
 
         if intersecao_plano.intersecao:
             ponto_intersecao = intersecao_plano.ponto_intersecao
+            #vetores do triangulo
             v0 = p2.vector_subtraction(p1)
             v1 = p3.vector_subtraction(p1)
             v2 = ponto_intersecao.vector_subtraction(p1)
