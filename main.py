@@ -4,14 +4,19 @@ from objects import Plane, Sphere, Mesh
 from cam import Cam
 from affine_transformations import translate, rotate_x, rotate_y, rotate_z
 from lightSource import Light
+from obj_reader import ObjReader
 # Divirtam-se :)
 
 
 def main():
-    # obj = ObjReader('inputs/icosahedron.obj')
-    # obj.print_faces()
-    
-    camera_ponto = Point(100, 200, -100)
+    obj = ObjReader('inputs/icosahedron.obj')
+    vertices = obj.get_vertices()
+    faces = obj.get_faces()
+    triplas = [face.vertice_indices for face in faces]
+    cores = [(255, 0, 0) for _ in range(len(faces))]  
+    normais = obj.get_normals()
+        
+    camera_ponto = Point(0, -15, 5)
     alvo_ponto = Point(0, 0, 0)
     up_vector = Vector(0, 1, 0)
     u_new = rotate_y([up_vector.x, up_vector.y, up_vector.z ], 90)
@@ -24,12 +29,12 @@ def main():
     n_center2 = translate([center.x,center.y, center.z], -50, -40, 0)
     n_center2 = Point(n_center2[0], n_center2[1], n_center2[2])
     
-    luz_posicao = Point(100, 300, 200)  # Posição da luz acima da câmera
+    luz_posicao = Point(10, 30, 20)  # Posição da luz acima da câmera
     #luz = Light(luz_posicao, [0.8, 0.8, 0.8], [0.3,0.3,0.3,], [0.6, 0.6, 0.6])  # Luz branca
     luz = Light(luz_posicao, [0,0.0,0.8], [0,0.0,0.3], [0,0.0,0.6])  # Luz vermelha
 
     camera = Cam(camera_ponto, alvo_ponto, up_vector, 1, 700, 700)
-    new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
+    # new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
     plano = Plane(Point(0, 30, 0), Vector(1, -0.3, -1), [255, 255, 255], kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, nCoefficient= 500)
     esfera =  Sphere(center, radius=50, color=[0, 150, 100],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, nCoefficient= 500)
     esfera2 =  Sphere(n_center, radius=50, color=[255, 150, 100],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, nCoefficient= 500)
@@ -50,20 +55,22 @@ def main():
     n3 = (p3.vector_subtraction(p2)).vector_product(p4.vector_subtraction(p2)).vector_normalize()
     n4 = (p0.vector_subtraction(p3)).vector_product(p4.vector_subtraction(p3)).vector_normalize()
     
+    corFaces = corFaces = [[face.kd.x, face.kd.y, face.kd.z] for face in obj.get_faces()]
+    
     # Criando a malha com os vetores e normais
     malha = Mesh(
-        4, 
-        5, 
-        [p0, p1, p2, p3, p4], 
-        [(0,1,4), (1,2,4), (2,3,4), (0,3,4)],
-        [n1, n2, n3, n4],
+        len(faces), 
+        len(vertices), 
+        vertices, 
+        triplas,
+        normais,
         [],
-        [[100, 0, 200], [255, 0, 0], [0, 255, 0], [0, 0, 255]],kdCoefficient= 0.9, ksCoefficient= 0.9, kaCoefficient= 0.3, nCoefficient= 500
+        corFaces,kdCoefficient= obj.get_kd().x, ksCoefficient= obj.get_ks().x, kaCoefficient= obj.get_ka().x, nCoefficient= obj.get_ns()
     )
 
-    objects = [malha, esfera, plano]
+    objects = [malha]
     #camera.raycasting(objects, luz)
-    new_camera.raycasting(objects, luz)
+    camera.raycasting(objects, luz)
 
 if __name__ == "__main__":
     main()

@@ -13,6 +13,8 @@ def normalize_list(list_):  # Pode ser utilizada para normalizar pontos, vetores
     delta = p.point_distance(p0)
     return [p.x/delta, p.y/delta, p.z/delta]
 
+def clamp_color(color_value):
+    return max(0, min(255, int(color_value * 255)))
 
 class Cam:
     def __init__(self, loc: Point, target: Point, upvector: Vector, dist, high, width):
@@ -195,7 +197,11 @@ class Cam:
                         (ambiente[2] + difusa[2] + especular[2])   # Canal B
                     ]
 
-        return color
+        return [
+            clamp_color(color[0]),
+            clamp_color(color[1]),
+            clamp_color(color[2])
+        ]
 
     
 
