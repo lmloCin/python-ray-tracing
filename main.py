@@ -24,16 +24,16 @@ def main():
     
     luz_posicao = Point(1000, 200, 200)  # Posição da luz acima da câmera
     luzFonte_posicao = Point(1000, 200, 200)
-    luzAmbiente = Light(luz_posicao, [100, 100, 100], [0.3,0.3,0.3], [100, 100, 100])  # Luz branca
-    Fonte1 = Light(luzFonte_posicao, [0 ,0, 0], [0.5,0.5,0.5], [180, 180, 180])
+    luzAmbiente = Light(luz_posicao, [1.0, 1.0, 1.0], [0.3,0.3,0.3], [0.6, 0.6, 0.6])  # Luz branca
+    Fonte1 = Light(luzFonte_posicao, [0 ,0, 0], [0.3,0.3, 0.3], [0.6, 0.6, 0.6])
     Fonte2 = Light(Point(300, 200, -200), [0, 0, 0], [0.3, 0.3, 0.3], [150, 150, 150])
     FontesDeLuz = [Fonte1]
     # luz = Light(luz_posicao, [0,0.0,0.8], [0,0.0,0.3], [0,0.0,0.6])  # Luz vermelha
 
     camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
     new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
-    plano = Plane(Point(0, 30, 0), Vector(1, -0.3, -1), [0, 0, 255], kdCoefficient= 0.9, ksCoefficient= 0.2, kaCoefficient= 0.3, krCoefficient = 0.1, ktCoefficient = 0.1, irCoefficient = 0.1, nCoefficient= 500)
-    esfera =  Sphere(center, radius=50, color=[0, 150, 0],kdCoefficient= 0.9, ksCoefficient= 0.4, kaCoefficient= 0.3, krCoefficient = 0.05, ktCoefficient = 0.1, irCoefficient = 0.1, nCoefficient= 500)
+    plano = Plane(Point(0, 100, 0), Vector(1, 1, 1), [0, 0, 255], kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.5, ktCoefficient = 0, irCoefficient = 1.52, nCoefficient= 500)
+    esfera =  Sphere(center, radius=50, color=[0, 255, 0],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.5, ktCoefficient = 0.5, irCoefficient = 1.52, nCoefficient= 500)
     esfera2 =  Sphere(n_center, radius=50, color=[255, 150, 100],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.3, ktCoefficient = 0.8, irCoefficient = 1.2, nCoefficient= 500)
     esfera3 =  Sphere(n_center2, radius=50, color=[0, 100, 255],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.3, ktCoefficient = 0.8, irCoefficient = 1.2, nCoefficient= 500)
 
@@ -62,7 +62,7 @@ def main():
     )
    
 
-    objects = [plano, esfera]
+    objects = [malha, esfera]
     camera.raycasting(objects, luzAmbiente, FontesDeLuz)
     # new_camera.raycasting(objects, luz)
 

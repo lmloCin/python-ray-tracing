@@ -39,8 +39,16 @@ class Cam:
     def phong(self, kaCoefficient, luzAmbiente: Light, Il:Light, obj, intersect_point, n, v, krCoefficient, objects, ktCoefficient, ior,  recursionCounter = 0, reflection = True, refraction = True, mi = 0):
         
         Ia = luzAmbiente.intensity_a
-        # componente ambiente da fórmula da iluminação
-        aComp = [kaCoefficient * Ia[0], kaCoefficient * Ia[1], kaCoefficient * Ia[2]]
+        if isinstance(obj, Sphere) or isinstance(obj, Plane):
+            # componente ambiente da fórmula da iluminação
+            aComp = [( obj.color[0]/255) * kaCoefficient * Ia[0], 
+                     ( obj.color[1]/255) * kaCoefficient * Ia[1],
+                     ( obj.color[2]/255) * kaCoefficient * Ia[2]]
+        
+        else:
+            aComp = [( mi.cor_normalizada[0]/255) * kaCoefficient * Ia[0], 
+                     ( mi.cor_normalizada[1]/255) * kaCoefficient * Ia[1],
+                     ( mi.cor_normalizada[2]/255) * kaCoefficient * Ia[2]]
         
         # componente difusa da iluminação
         dComp = [0,0,0]
@@ -63,14 +71,14 @@ class Cam:
             n_x_l = l.vector_dot_product(n)
             if isinstance(obj, Sphere) or isinstance(obj, Plane):
                 # Componente difusa
-                dComp = [(Il[i].intensity_d[0] * obj.color[0] * obj.kdCoefficient * n_x_l) + dComp[0],
-                        (Il[i].intensity_d[1] * obj.color[1] * obj.kdCoefficient * n_x_l) + dComp[1],
-                        (Il[i].intensity_d[2] * obj.color[2] * obj.kdCoefficient * n_x_l) + dComp[2]]
+                dComp = [(Il[i].intensity_d[0] *( obj.color[0]/255) * obj.kdCoefficient * n_x_l) + dComp[0],
+                        (Il[i].intensity_d[1] * (obj.color[1]/255) * obj.kdCoefficient * n_x_l) + dComp[1],
+                        (Il[i].intensity_d[2] * (obj.color[2]/255) * obj.kdCoefficient * n_x_l) + dComp[2]]
             else:
                 # Componente difusa
-                dComp = [(Il[i].intensity_d[0] * mi.cor_normalizada[0] * obj.kdCoefficient * n_x_l) + dComp[0],
-                            (Il[i].intensity_d[1] * mi.cor_normalizada[1] * obj.kdCoefficient * n_x_l) + dComp[1],
-                            (Il[i].intensity_d[2] * mi.cor_normalizada[2] * obj.kdCoefficient * n_x_l) + dComp[2]]
+                dComp = [(Il[i].intensity_d[0] * (mi.cor_normalizada[0]/255) * obj.kdCoefficient * n_x_l) + dComp[0],
+                            (Il[i].intensity_d[1] * (mi.cor_normalizada[1]/255) * obj.kdCoefficient * n_x_l) + dComp[1],
+                            (Il[i].intensity_d[2] * (mi.cor_normalizada[2]/255)  * obj.kdCoefficient * n_x_l) + dComp[2]]
     
             
             # Calcula o vetor de reflexão (R) usando a fórmula: R = 2 * (N · L) * N - L
@@ -80,11 +88,20 @@ class Cam:
 
             # Calcula o produto escalar entre o vetor de reflexão (R) e o vetor da câmera (V)
             r_x_v = r.vector_dot_product(v)
-            
-            # Componente Especular
-            sComp = [(Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
-                      (Il[i].intensity_s[1] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[1]),
-                      (Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
+
+            #sComp = [(( obj.color[0]/255) * Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
+            #            (( obj.color[1]/255) * Il[i].intensity_s[1] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[1]),
+            #            (( obj.color[2]/255) * Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
+            if isinstance(obj, Sphere) or isinstance(obj, Plane):
+                #Componente Especular
+                sComp = [(( obj.color[0]/255) * Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
+                        (( obj.color[1]/255) * Il[i].intensity_s[1] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[1]),
+                        (( obj.color[2]/255) * Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
+            else:
+                #Componente Especular
+                sComp = [(( mi.cor_normalizada[0]/255) * Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
+                        (( mi.cor_normalizada[1]/255) * Il[i].intensity_s[1] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[1]),
+                        (( mi.cor_normalizada[2]/255) * Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
             
         # Componente Recursiva 
         if recursionCounter <= 3:
@@ -96,7 +113,9 @@ class Cam:
                 reflectedColor_IR = self.intersection(reflection_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = True, refraction = False)
                 
                 # Componente de reflexão
-                reflectionComp = [krCoefficient * reflectedColor_IR[0], krCoefficient * reflectedColor_IR[1], krCoefficient * reflectedColor_IR[2]]
+                reflectionComp = [  krCoefficient * (reflectedColor_IR[0]/255), 
+                                   krCoefficient * (reflectedColor_IR[1]/255), 
+                                   krCoefficient * (reflectedColor_IR[2]/255)]
         
             if refraction and ktCoefficient > 0:
                 
@@ -118,13 +137,14 @@ class Cam:
                     refractedColor_IT = self.intersection(refracted_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = False, refraction = True)
                     
                     # Componente de refração
-                    refractionComp = [ktCoefficient * refractedColor_IT[0], ktCoefficient * refractedColor_IT[1], ktCoefficient * refractedColor_IT[2] ]
+                    refractionComp = [ktCoefficient * (refractedColor_IT[0]/255), ktCoefficient * (refractedColor_IT[1]/255), ktCoefficient * (refractedColor_IT[2]/255) ]
         
         color = [aComp[0] + dComp[0] + sComp[0] + reflectionComp[0] + refractionComp[0],
                   aComp[1] + dComp[1] + sComp[1] + reflectionComp[1] + refractionComp[1],
                   aComp[2] + dComp[2] + sComp[2] + reflectionComp[2] + refractionComp[2]]
-        finalColor = np.clip(color, 0, 255)
-        return finalColor 
+        fator_escala = 255 
+        finalColor = [color[0] * fator_escala, color[1] * fator_escala, color[2] * fator_escala]
+        return finalColor
                     
                     
             
