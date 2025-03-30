@@ -87,11 +87,14 @@ class Cam:
                       (Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
             
         # Componente Recursiva 
-        if recursionCounter <= 3:
+        if recursionCounter < 3:
             
             if  reflection and krCoefficient > 0:
                 
-                reflection_vector = Vector(r.x * -1, r.y * -1, r.z * -1)
+                n_dot_v = n.vector_dot_product(v)
+                reflection_vector = n.vector_x_scalar(2 * n_dot_v).vector_subtraction(v)
+                reflection_vector = reflection_vector.vector_normalize()  # Normalização crucial
+                reflection_vector = Vector(-reflection_vector.x, -reflection_vector.y, -reflection_vector.z)
                 recursionCounter = recursionCounter + 1
                 reflectedColor_IR = self.intersection(reflection_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = True, refraction = False)
                 

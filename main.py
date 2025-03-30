@@ -32,8 +32,8 @@ def main():
 
     camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
     new_camera = Cam(camera_ponto, alvo_ponto, u_new, 1, 500, 500)
-    plano = Plane(Point(0, 30, 0), Vector(1, -0.3, -1), [0, 0, 255], kdCoefficient= 0.9, ksCoefficient= 0.2, kaCoefficient= 0.3, krCoefficient = 0.1, ktCoefficient = 0.1, irCoefficient = 0.1, nCoefficient= 500)
-    esfera =  Sphere(center, radius=50, color=[0, 150, 0],kdCoefficient= 0.9, ksCoefficient= 0.4, kaCoefficient= 0.3, krCoefficient = 0.05, ktCoefficient = 0.1, irCoefficient = 0.1, nCoefficient= 500)
+    plano = Plane(Point(0, 30, 0), Vector(1, -0.3, -1), [0, 0, 255], kdCoefficient= 0.9, ksCoefficient= 0.2, kaCoefficient= 0.3, krCoefficient = 0.5, ktCoefficient = 0.5, irCoefficient = 1.52, nCoefficient= 500)
+    esfera =  Sphere(center, radius=50, color=[0, 150, 0],kdCoefficient= 0.9, ksCoefficient= 0.4, kaCoefficient= 0.3, krCoefficient = 0.5, ktCoefficient = 0.5, irCoefficient = 1.52, nCoefficient= 500)
     esfera2 =  Sphere(n_center, radius=50, color=[255, 150, 100],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.3, ktCoefficient = 0.8, irCoefficient = 1.2, nCoefficient= 500)
     esfera3 =  Sphere(n_center2, radius=50, color=[0, 100, 255],kdCoefficient= 0.8, ksCoefficient= 0.8, kaCoefficient= 0.3, krCoefficient = 0.3, ktCoefficient = 0.8, irCoefficient = 1.2, nCoefficient= 500)
 
