@@ -61,6 +61,8 @@ class Cam:
             
             # Calcula o produto escalar entre o vetor da luz (L) e o vetor normal (N)
             n_x_l = l.vector_dot_product(n)
+            
+            
             if isinstance(obj, Sphere) or isinstance(obj, Plane):
                 # Componente difusa
                 dComp = [(Il[i].intensity_d[0] * obj.color[0] * obj.kdCoefficient * n_x_l) + dComp[0],
@@ -82,16 +84,20 @@ class Cam:
             r_x_v = r.vector_dot_product(v)
             
             # Componente Especular
-            sComp = [(Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
+            sComp += [(Il[i].intensity_s[0] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[0]),
                       (Il[i].intensity_s[1] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[1]),
                       (Il[i].intensity_s[2] * obj.ksCoefficient * (r_x_v ** obj.nCoefficient) + sComp[2])]
-            
+      
         # Componente Recursiva 
-        if recursionCounter <= 3:
+        if recursionCounter < 3:
             
             if  reflection and krCoefficient > 0:
                 
-                reflection_vector = Vector(r.x * -1, r.y * -1, r.z * -1)
+                n_dot_v = n.vector_dot_product(v)
+                reflection_vector = n.vector_x_scalar(2 * n_dot_v).vector_subtraction(v)
+                reflection_vector = reflection_vector.vector_normalize()  # Normalização crucial
+                reflection_vector = Vector(-reflection_vector.x, -reflection_vector.y, -reflection_vector.z)
+                
                 recursionCounter = recursionCounter + 1
                 reflectedColor_IR = self.intersection(reflection_vector, objects, luzAmbiente, Il, intersect_point, recursionCounter, reflection = True, refraction = False)
                 
@@ -102,10 +108,14 @@ class Cam:
                 
                 # calcula o produto escalar entre o vetor da camera e o vetor normal do objeto
                 n_x_v = n.vector_dot_product(v)
-                normal = Vector(n.x * -1, n.y * -1, n.z * -1)
-                if n_x_v < 0:
-                    ior = 1/ior
-                    n_x_v = n_x_v * -1
+                if n_x_v < 0:  # O raio está entrando no material
+                    normal = n  # Mantém a normal original
+                else:  # O raio está saindo do material
+                    normal = Vector(-n.x, -n.y, -n.z)  # Inverte a normal
+
+                ior = 1 / ior if n_x_v > 0 else ior  # Ajusta o índice de refração se estiver saindo
+                n_x_v = abs(n_x_v)  # Garante que o valor seja positivo
+
                     
                 delta = 1 - (1 - n_x_v * n_x_v) / (ior * ior)
                 if delta >= 0:
@@ -123,11 +133,8 @@ class Cam:
         color = [aComp[0] + dComp[0] + sComp[0] + reflectionComp[0] + refractionComp[0],
                   aComp[1] + dComp[1] + sComp[1] + reflectionComp[1] + refractionComp[1],
                   aComp[2] + dComp[2] + sComp[2] + reflectionComp[2] + refractionComp[2]]
-        finalColor = np.clip(color, 0, 255)
-        return finalColor 
-                    
-                    
-            
+    
+        return color 
 
     def intersection(self, vetor: Vector, objects, luzAmbiente:Light, fontesDeLuz:Light, intersect_point = None, recursionCounter = 0, reflection = True, refraction = True):
         
@@ -151,7 +158,7 @@ class Cam:
                         n = n.vector_normalize()  # Garante que o vetor normal está normalizado
                         
                         # Calcula o vetor da câmera (V) em relação ao ponto de interseção
-                        v = self.local.point_subtraction(intersect_point)
+                        v =  intersect_point.point_subtraction(self.local)
                         v = Vector(v.x, v.y, v.z).vector_normalize()  # Normaliza o vetor da câmera
                         
                         color = self.phong(obj.kaCoefficient, luzAmbiente, fontesDeLuz, obj, intersect_point, n, v, obj.krCoefficient, objects, obj.ktCoefficient, obj.IOR, recursionCounter, reflection = reflection, refraction = refraction, mi = False)
@@ -208,7 +215,7 @@ class Cam:
                         #r = r.vector_subtraction(l)
                         #r = r.vector_normalize()
                          # Calcula o vetor da câmera (V) em relação ao ponto de interseção
-                        v = self.local.point_subtraction(intersect_point)
+                        v = intersect_point.point_subtraction(self.local)
                         v = Vector(v.x, v.y, v.z).vector_normalize()
                         # Produto vetorial de r e v
                         #r_x_v = r.vector_dot_product(v)
@@ -295,7 +302,8 @@ class Cam:
             for i in range(self.width):
                 for j in range(self.high):
                     vetor_atual = pixel_0_0 + deltay*i + deltax*j
-                    image[j, i] = self.intersection(Vector(vetor_atual[0], vetor_atual[1], vetor_atual[2]), objects, luzAmbiente, fontesDeLuz)
+                    cor_normalizada = self.intersection(Vector(vetor_atual[0], vetor_atual[1], vetor_atual[2]), objects, luzAmbiente, fontesDeLuz) 
+                    image[j, i] = np.clip(np.array(cor_normalizada) * 255, 0, 255)
             cv.imshow("Raycasting", image)
             cv.waitKey(0)
             cv.destroyAllWindows('i')
