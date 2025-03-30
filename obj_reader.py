@@ -63,10 +63,10 @@ class ObjReader:
                     self.cur_material = self.colormap.get_material(material_name)
 
                 elif line.startswith('v '):
-                    self.vertices.append(Point(*map(float, line[2:].split())))
+                    self.vertices.append(Vector(*map(float, line[2:].split())))
 
                 elif line.startswith('vn '):
-                    pass
+                    self.normals.append(Vector(*map(float, line[3:].split())))
 
                 elif line.startswith('f '):
                     face = Face()
@@ -154,6 +154,8 @@ class ObjReader:
             Retorna a lista de vértices do objeto.
         '''
         return self.vertices
+    def get_normals(self):
+        return self.normals
 
     def print_faces_points(self):
         for(enum, face) in enumerate(self.faces_points):

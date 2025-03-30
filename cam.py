@@ -154,7 +154,7 @@ class Cam:
                         n = n.vector_normalize()  # Garante que o vetor normal está normalizado
                         
                         # Calcula o vetor da câmera (V) em relação ao ponto de interseção
-                        v = self.local.point_subtraction(intersect_point)
+                        v =  intersect_point.point_subtraction(self.local)
                         v = Vector(v.x, v.y, v.z).vector_normalize()  # Normaliza o vetor da câmera
                         
                         color = self.phong(obj.kaCoefficient, luzAmbiente, fontesDeLuz, obj, intersect_point, n, v, obj.krCoefficient, objects, obj.ktCoefficient, obj.IOR, recursionCounter, reflection = reflection, refraction = refraction, mi = False)
@@ -211,7 +211,7 @@ class Cam:
                         #r = r.vector_subtraction(l)
                         #r = r.vector_normalize()
                          # Calcula o vetor da câmera (V) em relação ao ponto de interseção
-                        v = self.local.point_subtraction(intersect_point)
+                        v = intersect_point.point_subtraction(self.local)
                         v = Vector(v.x, v.y, v.z).vector_normalize()
                         # Produto vetorial de r e v
                         #r_x_v = r.vector_dot_product(v)
