@@ -162,3 +162,105 @@ class Mesh:
                 return Mesh.Intersecao_Return(True, intersecao_plano.t, ponto_intersecao, cor_normalizada, idx_triangulo)
 
         return Mesh.Intersecao_Return(False, 1000000, Vector(0, 0, 0), cor_normalizada, idx_triangulo = 0)
+
+class Paraboloid:
+    def __init__(self, vertex: Point, p_parameter, color, kdCoefficient, ksCoefficient, kaCoefficient, krCoefficient, ktCoefficient, irCoefficient, nCoefficient):
+        self.vertex = vertex            # Vértice do paraboloide (ponto de referência para a forma)
+        self.p_parameter = p_parameter  # Parâmetro que controla a abertura do paraboloide
+        self.color = color
+        self.kdCoefficient = kdCoefficient
+        self.ksCoefficient = ksCoefficient
+        self.kaCoefficient = kaCoefficient
+        self.krCoefficient = krCoefficient
+        self.ktCoefficient = ktCoefficient
+        self.IOR = irCoefficient
+        self.nCoefficient = nCoefficient
+
+    def inter_paraboloid_line(self, ray_origin: Point, ray_direction: Vector):
+        """
+        Calcula a interseção entre uma reta e o paraboloide definido pela equação implícita:
+        
+            (x - v_x)^2 + (y - v_y)^2 - 4*p*(z - v_z) = 0
+        
+        onde v = (v_x, v_y, v_z) é o vértice do paraboloide e p é o parâmetro de abertura.
+        A reta é definida por: ray_origin + t * ray_direction.
+        """
+        # Calcula as diferenças entre o ponto de origem da reta e o vértice do paraboloide.
+        dx0 = ray_origin.x - self.vertex.x
+        dy0 = ray_origin.y - self.vertex.y
+        dz0 = ray_origin.z - self.vertex.z
+        
+        # Componentes do vetor direção da reta.
+        Dx = ray_direction.x
+        Dy = ray_direction.y
+        Dz = ray_direction.z
+        
+        # Parâmetro que controla a abertura do paraboloide.
+        p = self.p_parameter
+
+        # Monta os coeficientes da equação quadrática A*t^2 + B*t + C = 0
+        # Originada da substituição da reta na equação implícita do paraboloide
+        A = Dx**2 + Dy**2
+        B = 2*(dx0 * Dx + dy0 * Dy) - 4*p*Dz
+        C = dx0**2 + dy0**2 - 4*p*dz0
+
+        # Se A for muito pequeno, trata-se de um caso degenerado (reta quase paralela à base do paraboloide)
+        if abs(A) < 1e-6:
+            if abs(B) < 1e-6:
+                return [False, [0, 0, 0], float('inf')]
+            t = -C / B
+            if t > 1e-6:
+                # Calcula o ponto de interseção usando a reta
+                x = ray_origin.x + Dx * t
+                y = ray_origin.y + Dy * t
+                z = ray_origin.z + Dz * t
+                return [True, [x, y, z], t]
+            else:
+                return [False, [0, 0, 0], float('inf')]
+
+        # Calcula o discriminante da equação quadrática
+        delta = B**2 - 4*A*C
+        if delta < 0:
+            # Se delta é negativo, não há solução real: não há interseção
+            return [False, [0, 0, 0], float('inf')]
+        
+        sqrt_delta = sqrt(delta)
+        # Calcula as duas raízes t1 e t2 da equação quadrática
+        t1 = (-B - sqrt_delta) / (2*A)
+        t2 = (-B + sqrt_delta) / (2*A)
+        
+        # Escolhe o menor t positivo, que indica a interseção mais próxima (da câmera)
+        t = float('inf')
+        if t1 > 1e-6 and t1 < t:
+            t = t1
+        if t2 > 1e-6 and t2 < t:
+            t = t2
+        
+        # Se nenhum valor de t válido foi encontrado, retorna sem interseção.
+        if t == float('inf'):
+            return [False, [0, 0, 0], float('inf')]
+        
+        # Calcula as coordenadas do ponto de interseção
+        x = ray_origin.x + Dx * t
+        y = ray_origin.y + Dy * t
+        z = ray_origin.z + Dz * t
+        return [True, [x, y, z], t]
+
+    def get_normal(self, point_intersection: Point):
+        """
+        Calcula a normal da superfície do paraboloide no ponto de interseção.
+        Para a função implícita do paraboloide:
+        
+            F(x,y,z) = (x - v_x)^2 + (y - v_y)^2 - 4*p*(z - v_z)
+        
+        o gradiente (∇F) fornece a normal, onde:
+        
+            ∇F(x,y,z) = (2*(x - v_x), 2*(y - v_y), -4*p)
+        
+        A normal é então normalizada para obter um vetor unitário.
+        """
+        x = point_intersection.x
+        y = point_intersection.y
+        # A componente z da normal é constante e depende do parâmetro p
+        normal = Vector(2*(x - self.vertex.x), 2*(y - self.vertex.y), -4*self.p_parameter)
+        return normal.vector_normalize()

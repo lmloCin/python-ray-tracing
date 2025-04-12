@@ -1,6 +1,6 @@
 from vector import Vector
 from point import Point
-from objects import Plane, Sphere, Mesh
+from objects import Plane, Sphere, Mesh, Paraboloid
 import cv2 as cv
 import numpy as np
 from lightSource import Light
@@ -39,7 +39,7 @@ class Cam:
     def phong(self, kaCoefficient, luzAmbiente: Light, Il:Light, obj, intersect_point, n, v, krCoefficient, objects, ktCoefficient, ior,  recursionCounter = 0, reflection = True, refraction = True, mi = 0):
         
         Ia = luzAmbiente.intensity_a
-        if isinstance(obj, Sphere) or isinstance(obj, Plane):
+        if isinstance(obj, Sphere) or isinstance(obj, Plane) or isinstance(obj, Paraboloid):
             # componente ambiente da fórmula da iluminação
             aComp = [( obj.color[0]/255) * kaCoefficient * Ia[0], 
                     ( obj.color[1]/255) * kaCoefficient * Ia[1],
@@ -68,7 +68,7 @@ class Cam:
             
             # Calcula o produto escalar entre o vetor da luz (L) e o vetor normal (N)
             n_x_l = l.vector_dot_product(n)
-            if isinstance(obj, Sphere) or isinstance(obj, Plane):
+            if isinstance(obj, Sphere) or isinstance(obj, Plane) or isinstance(obj, Paraboloid):
                 # Componente difusa
                 dComp = [(Il[i].intensity_d[0] * obj.color[0] * obj.kdCoefficient * n_x_l) + dComp[0],
                         (Il[i].intensity_d[1] * obj.color[1] * obj.kdCoefficient * n_x_l) + dComp[1],
@@ -289,6 +289,20 @@ class Cam:
                         #(ambiente[2] + difusa[2] + especular[2])   # Canal B
                     #]
                     color = self.phong(obj.kaCoefficient, luzAmbiente, fontesDeLuz, obj, intersect_point, n, v, obj.krCoefficient, objects, obj.ktCoefficient, obj.IOR, recursionCounter, reflection = reflection, refraction = refraction, mi = mesh_inter)
+
+            elif isinstance(obj, Paraboloid):
+                par_inter = obj.inter_paraboloid_line(self.local, vetor)
+                if par_inter[0] and par_inter[2] >= 0.1:
+                    if par_inter[2] < menor_t:
+                        menor_t = par_inter[2]
+                        intersect_point = self.local.point_sum(
+                            Point(vetor.x * par_inter[2], vetor.y * par_inter[2], vetor.z * par_inter[2])
+                        )
+                        # Calcula a normal usando o método get_normal da classe Paraboloid
+                        n = obj.get_normal(intersect_point)
+                        v = self.local.point_subtraction(intersect_point)
+                        v = Vector(v.x, v.y, v.z).vector_normalize()
+                        color = self.phong(obj.kaCoefficient, luzAmbiente, fontesDeLuz, obj, intersect_point, n, v, obj.krCoefficient, objects, obj.ktCoefficient, obj.IOR, recursionCounter, reflection = reflection, refraction = refraction, mi = False)
 
         return color
 
